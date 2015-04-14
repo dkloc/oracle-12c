@@ -3,13 +3,10 @@
 cat >> /home/oracle/.bash_profile <<EOF
 ORACLE_BASE=/u01/app/oracle
 export ORACLE_BASE
-
 ORACLE_SID=ORCL
 export ORACLE_SID
-
 ORACLE_HOME=$ORACLE_BASE/product/12.1.0/dbhome_1
 export ORACLE_HOME
-
 PATH=$ORACLE_HOME/bin:$PATH
 export PATH
 EOF
@@ -46,6 +43,15 @@ cp pupbld.sql pupbld-e.sql
 echo "exit" >> pupbld-e.sql
 su -s /bin/bash oracle -c "sqlplus system/manager @?/sqlplus/admin/pupbld-e.sql > /tmp/pupbld.log"
 rm pupbld-e.sql
+echo ""
+
+date
+echo "Running mdinst.sql install for spatial and graph feature..."
+cd $ORACLE_HOME/md/admin
+cp mdinst.sql mdinst-e.sql
+echo "exit" >> mdinst-e.sql
+su -s /bin/bash oracle -c "sqlplus system/manager @?/md/admin/mdinst-e.sql > /tmp/mdinst.log"
+rm mdinst-e.sql
 echo ""
 
 date

@@ -1,5 +1,5 @@
-FROM wscherphof/oracle-12c:installed
-MAINTAINER Wouter Scherphof <wouter.scherphof@gmail.com>
+FROM oracle-12c:installed
+MAINTAINER Sheikh Sameer <sheikh.sameer1609@gmail.com>
 
 RUN rm -rf /tmp/install
 
