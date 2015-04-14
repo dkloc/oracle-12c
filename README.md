@@ -10,13 +10,50 @@ A [Docker](https://www.docker.com/) [image](https://registry.hub.docker.com/u/ws
 This section will guide you step by step to build oracle-12c docker image.
 The build will have following features by default:
 
-1. Oracle database server with spatial features. 
+ 1.  Oracle database server with spatial features. 
   (If you want additional features, edit the file `create` file inside step2 folder and add required feature)
-
-2. New user will be created with name `simon` and password `root` 
+ 
+ 2.  New user will be created with name `simon` and password `root` 
 ( If you want to create custom  user, edit the file startdb.sql and write the sql statements to add new user)
-3. For static registation of database intance with listener you can add following
-4. Default database will be `ORCL`at port `1521`.
+
+ 3.  For static registation of database intance with listener you can edit `start` file inside `step3`folder
+
+```
+#!/bin/bash
+
+mount -t tmpfs shmfs -o size=4g /dev/shm
+
+echo "SID_LIST_LISTENER =
+  (SID_LIST =
+     (SID_DESC =
+      (GLOBAL_DBNAME = ORCL)
+      (ORACLE_HOME = /u01/app/oracle/product/12.1.0/dbhome_1)
+      (SID_NAME = ORCL)
+    )
+  )
+LISTENER =
+  (DESCRIPTION_LIST =
+    (DESCRIPTION =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = $HOSTNAME)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))
+    )
+  )" >> $ORACLE_HOME/network/admin/listener.ora
+
+while true; do
+  status=`ps -ef | grep tns | grep oracle`
+  pmon=`ps -ef | egrep pmon_$ORACLE_SID'\>' | grep -v grep`
+  if [ "$status" == "" ] || [ "$pmon" == "" ]
+  then
+    su -s /bin/bash oracle -c "lsnrctl start"
+    su -s /bin/bash oracle -c "sqlplus /nolog @?/config/scripts/startdb.sql"
+    su -s /bin/bash oracle -c "lsnrctl status"
+  fi
+  sleep 1m
+done;
+
+```
+
+ 4.Default database will be `ORCL`at port `1521`.
 
 #### Issues and solutions:
 
